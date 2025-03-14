@@ -76,58 +76,61 @@ def analizar_sentimientos_emociones_es(df):
     analyzer = SentimentIntensityAnalyzer()
     translator = Translator()
     if not df.empty:
-        sentimientos_vader_publicacion = []
-        sentimientos_textblob_publicacion = []
-        sentimientos_vader_web = []
-        sentimientos_textblob_web = []
-        pertinencia = []
-        reacciones_positivas = []
-        for index, row in df.iterrows():
-            publicacion = row['Publicación']
-            url_web = row['URL']
-            reaccion = row.get("Reacciones Positivas", 0)
-            reacciones_positivas.append(reaccion)
-            try:
-                traduccion_publicacion = translator.translate(publicacion, dest='en').text
-                sentimiento_vader_publicacion = analyzer.polarity_scores(traduccion_publicacion)
-            except:
-                sentimiento_vader_publicacion = {'compound': 0, 'neg': 0, 'neu': 1, 'pos': 0}
-            sentimientos_vader_publicacion.append(sentimiento_vader_publicacion)
-            sentimiento_textblob_publicacion = TextBlob(publicacion).sentiment.polarity
-            sentimientos_textblob_publicacion.append(sentimiento_textblob_publicacion)
-            contenido_web = extraer_contenido_web(url_web) if pd.notna(url_web) else ""
-            if contenido_web:
+        if 'URL' in df.columns: # Agregado verificación de columna
+            sentimientos_vader_publicacion = []
+            sentimientos_textblob_publicacion = []
+            sentimientos_vader_web = []
+            sentimientos_textblob_web = []
+            pertinencia = []
+            reacciones_positivas = []
+            for index, row in df.iterrows():
+                publicacion = row['Publicación']
+                url_web = row['URL'] # Ahora es seguro acceder a 'URL'
+                reaccion = row.get("Reacciones Positivas", 0)
+                reacciones_positivas.append(reaccion)
                 try:
-                    traduccion_web = translator.translate(contenido_web, dest='en').text
-                    sentimiento_vader_web = analyzer.polarity_scores(traduccion_web)
+                    traduccion_publicacion = translator.translate(publicacion, dest='en').text
+                    sentimiento_vader_publicacion = analyzer.polarity_scores(traduccion_publicacion)
                 except:
-                    sentimiento_vader_web = {'compound': 0, 'neg': 0, 'neu': 1, 'pos': 0}
-                sentimientos_vader_web.append(sentimiento_vader_web)
-                sentimiento_textblob_web = TextBlob(contenido_web).sentiment.polarity
-                sentimientos_textblob_web.append(sentimiento_textblob_web)
-                pertinencia.append(1 if any(word in contenido_web for word in publicacion.split()) else 0)
+                    sentimiento_vader_publicacion = {'compound': 0, 'neg': 0, 'neu': 1, 'pos': 0}
+                sentimientos_vader_publicacion.append(sentimiento_vader_publicacion)
+                sentimiento_textblob_publicacion = TextBlob(publicacion).sentiment.polarity
+                sentimientos_textblob_publicacion.append(sentimiento_textblob_publicacion)
+                contenido_web = extraer_contenido_web(url_web) if pd.notna(url_web) else ""
+                if contenido_web:
+                    try:
+                        traduccion_web = translator.translate(contenido_web, dest='en').text
+                        sentimiento_vader_web = analyzer.polarity_scores(traduccion_web)
+                    except:
+                        sentimiento_vader_web = {'compound': 0, 'neg': 0, 'neu': 1, 'pos': 0}
+                    sentimientos_vader_web.append(sentimiento_vader_web)
+                    sentimiento_textblob_web = TextBlob(contenido_web).sentiment.polarity
+                    sentimientos_textblob_web.append(sentimiento_textblob_web)
+                    pertinencia.append(1 if any(word in contenido_web for word in publicacion.split()) else 0)
 
-                # Nubes de palabras dentro de streamlit.
-                publicacion_wordcloud = generar_nube_palabras(publicacion)
-                if publicacion_wordcloud:
-                  st.image(publicacion_wordcloud, caption=f"Nube de palabras para publicación {index}")
+                    # Nubes de palabras dentro de streamlit.
+                    publicacion_wordcloud = generar_nube_palabras(publicacion)
+                    if publicacion_wordcloud:
+                      st.image(publicacion_wordcloud, caption=f"Nube de palabras para publicación {index}")
 
-                web_wordcloud = generar_nube_palabras(contenido_web)
-                if web_wordcloud:
-                  st.image(web_wordcloud, caption=f"Nube de palabras para web {index}")
+                    web_wordcloud = generar_nube_palabras(contenido_web)
+                    if web_wordcloud:
+                      st.image(web_wordcloud, caption=f"Nube de palabras para web {index}")
 
-            else:
-                sentimientos_vader_web.append(None)
-                sentimientos_textblob_web.append(None)
-                pertinencia.append(None)
+                else:
+                    sentimientos_vader_web.append(None)
+                    sentimientos_textblob_web.append(None)
+                    pertinencia.append(None)
 
-        df['Sentimientos_VADER_Publicacion'] = sentimientos_vader_publicacion
-        df['Sentimientos_TextBlob_Publicacion'] = sentimientos_textblob_publicacion
-        df['Sentimientos_VADER_Web'] = sentimientos_vader_web
-        df['Sentimientos_TextBlob_Web'] = sentimientos_textblob_web
-        df['Pertinencia'] = pertinencia
-        df['Reacciones_Positivas'] = reacciones_positivas
-        st.success("Análisis de sentimientos y emociones completado.")
+            df['Sentimientos_VADER_Publicacion'] = sentimientos_vader_publicacion
+            df['Sentimientos_TextBlob_Publicacion'] = sentimientos_textblob_publicacion
+            df['Sentimientos_VADER_Web'] = sentimientos_vader_web
+            df['Sentimientos_TextBlob_Web'] = sentimientos_textblob_web
+            df['Pertinencia'] = pertinencia
+            df['Reacciones_Positivas'] = reacciones_positivas
+            st.success("Análisis de sentimientos y emociones completado.")
+        else:
+            st.warning("La columna 'URL' no se encuentra en el DataFrame.")
     else:
         st.warning("El DataFrame está vacío.")
 
