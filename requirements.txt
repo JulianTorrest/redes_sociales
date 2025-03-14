@@ -1,1 +1,15 @@
+pandas
+gspread
+google-auth
+google-auth-oauthlib
+vaderSentiment
+text2emotion
+textblob
+googletrans==4.0.0-rc1
+nltk
+requests
+beautifulsoup4
+wordcloud
+matplotlib
+Pillow
 
