@@ -20,16 +20,13 @@ except LookupError:
 url_hoja_calculo = "https://raw.githubusercontent.com/JulianTorrest/redes_sociales/main/Redes%20Sociales.csv"
 
 def leer_csv_desde_github(url):
-    """Lee todas las hojas de un archivo CSV desde una URL de GitHub."""
+    """Lee un archivo CSV desde una URL de GitHub."""
     try:
         response = requests.get(url)
         response.raise_for_status()
-        excel_file = BytesIO(response.content)
-        # Leer todas las hojas del archivo Excel
-        dfs = pd.read_excel(excel_file, sheet_name=None)
-        # Concatenar todas las hojas en un solo DataFrame
-        dataframe = pd.concat(dfs.values(), ignore_index=True)
-        return dataframe
+        csv_content = StringIO(response.text)
+        df = pd.read_csv(csv_content)
+        return df
     except requests.exceptions.RequestException as e:
         st.error(f"Error al descargar el archivo CSV: {e}")
         return None
@@ -166,7 +163,6 @@ def generar_tablas_graficos(df):
             st.pyplot(plt)
         else:
             st.warning("El DataFrame está vacío, no se pueden generar tablas ni gráficos.")
-
 def main():
     st.title("Análisis de Redes Sociales")
     dataframe = leer_csv_desde_github(url_hoja_calculo)
@@ -177,4 +173,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
