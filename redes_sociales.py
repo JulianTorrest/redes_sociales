@@ -76,7 +76,7 @@ def analizar_sentimientos_emociones_es(df):
     analyzer = SentimentIntensityAnalyzer()
     translator = Translator()
     if not df.empty:
-        if 'URL' in df.columns: # Agregado verificación de columna
+        if 'URL' in df.columns:
             sentimientos_vader_publicacion = []
             sentimientos_textblob_publicacion = []
             sentimientos_vader_web = []
@@ -85,7 +85,7 @@ def analizar_sentimientos_emociones_es(df):
             reacciones_positivas = []
             for index, row in df.iterrows():
                 publicacion = row['Publicación']
-                url_web = row['URL'] # Ahora es seguro acceder a 'URL'
+                url_web = row['URL']
                 reaccion = row.get("Reacciones Positivas", 0)
                 reacciones_positivas.append(reaccion)
                 try:
@@ -121,6 +121,10 @@ def analizar_sentimientos_emociones_es(df):
                     sentimientos_vader_web.append(None)
                     sentimientos_textblob_web.append(None)
                     pertinencia.append(None)
+
+            # Agregar depuración
+            print("Longitud de sentimientos_textblob_publicacion:", len(sentimientos_textblob_publicacion))
+            print("Primeros 5 elementos de sentimientos_textblob_publicacion:", sentimientos_textblob_publicacion[:5])
 
             df['Sentimientos_VADER_Publicacion'] = sentimientos_vader_publicacion
             df['Sentimientos_TextBlob_Publicacion'] = sentimientos_textblob_publicacion
@@ -160,4 +164,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
