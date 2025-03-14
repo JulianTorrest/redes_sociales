@@ -76,7 +76,7 @@ def analizar_sentimientos_emociones_es(df):
     analyzer = SentimentIntensityAnalyzer()
     translator = Translator()
     if not df.empty:
-        if 'URL' in df.columns:
+        if 'Paginas relacionadas' in df.columns: # Corrección del nombre de la columna
             sentimientos_vader_publicacion = []
             sentimientos_textblob_publicacion = []
             sentimientos_vader_web = []
@@ -85,7 +85,7 @@ def analizar_sentimientos_emociones_es(df):
             reacciones_positivas = []
             for index, row in df.iterrows():
                 publicacion = row['Publicación']
-                url_web = row['URL']
+                url_web = row['Paginas relacionadas'] # Corrección del nombre de la columna
                 reaccion = row.get("Reacciones Positivas", 0)
                 reacciones_positivas.append(reaccion)
                 try:
@@ -136,7 +136,7 @@ def analizar_sentimientos_emociones_es(df):
             df['Reacciones_Positivas'] = reacciones_positivas
             st.success("Análisis de sentimientos y emociones completado.")
         else:
-            st.warning("La columna 'URL' no se encuentra en el DataFrame.")
+            st.warning("La columna 'Paginas relacionadas' no se encuentra en el DataFrame.") # Corrección del nombre de la columna
     else:
         st.warning("El DataFrame está vacío.")
 
