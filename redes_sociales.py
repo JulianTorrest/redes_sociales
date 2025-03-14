@@ -168,3 +168,10 @@ def main():
     st.title("Análisis de Redes Sociales")
     dataframe = leer_csv_desde_github(url_hoja_calculo)
     if dataframe is not None:
+        print(dataframe.head())  # Depuración: imprimir el DataFrame cargado
+        analizar_sentimientos_emociones_es(dataframe)
+        generar_tablas_graficos(dataframe)
+
+if __name__ == "__main__":
+    main()
+
