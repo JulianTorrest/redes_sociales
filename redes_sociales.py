@@ -38,13 +38,20 @@ def leer_csv_desde_github(url):
         return None
 
 def extraer_contenido_web(url):
-    """Extrae el contenido de texto de una página web."""
+    """Extrae el contenido de texto de una página web, omitiendo errores 403."""
     try:
         response = requests.get(url)
-        response.raise_for_status()
+        response.raise_for_status()  # Lanza una excepción para códigos de error HTTP
         soup = BeautifulSoup(response.content, 'html.parser')
         text = ' '.join([p.text for p in soup.find_all('p')])
         return text
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 403:
+            st.warning(f"Acceso prohibido (403) a: {url}. Omitiendo.")
+            return ""  # Devuelve una cadena vacía en caso de error 403
+        else:
+            st.error(f"Error al obtener la página web: {e}")
+            return ""
     except requests.exceptions.RequestException as e:
         st.error(f"Error al obtener la página web: {e}")
         return ""
@@ -161,9 +168,3 @@ def main():
     st.title("Análisis de Redes Sociales")
     dataframe = leer_csv_desde_github(url_hoja_calculo)
     if dataframe is not None:
-        print(dataframe.head())  # Depuración: imprimir el DataFrame cargado
-        analizar_sentimientos_emociones_es(dataframe)
-        generar_tablas_graficos(dataframe)
-
-if __name__ == "__main__":
-    main()
