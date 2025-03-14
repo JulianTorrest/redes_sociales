@@ -121,6 +121,8 @@ def analizar_sentimientos_emociones_es(df):
                     sentimientos_vader_web.append(None)
                     sentimientos_textblob_web.append(None)
                     pertinencia.append(None)
+                # Depuración: imprimir la lista en cada iteración
+                print("Sentimientos TextBlob Publicación:", sentimientos_textblob_publicacion)
 
             # Agregar depuración
             print("Longitud de sentimientos_textblob_publicacion:", len(sentimientos_textblob_publicacion))
@@ -159,6 +161,7 @@ def main():
     st.title("Análisis de Redes Sociales")
     dataframe = leer_csv_desde_github(url_hoja_calculo)
     if dataframe is not None:
+        print(dataframe.head())  # Depuración: imprimir el DataFrame cargado
         analizar_sentimientos_emociones_es(dataframe)
         generar_tablas_graficos(dataframe)
 
