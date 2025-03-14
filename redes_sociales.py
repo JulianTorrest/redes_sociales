@@ -20,13 +20,16 @@ except LookupError:
 url_hoja_calculo = "https://raw.githubusercontent.com/JulianTorrest/redes_sociales/main/Redes%20Sociales.csv"
 
 def leer_csv_desde_github(url):
-    """Lee un archivo CSV desde una URL de GitHub."""
+    """Lee todas las hojas de un archivo CSV desde una URL de GitHub."""
     try:
         response = requests.get(url)
         response.raise_for_status()
-        csv_content = StringIO(response.text)
-        df = pd.read_csv(csv_content)
-        return df
+        excel_file = BytesIO(response.content)
+        # Leer todas las hojas del archivo Excel
+        dfs = pd.read_excel(excel_file, sheet_name=None)
+        # Concatenar todas las hojas en un solo DataFrame
+        dataframe = pd.concat(dfs.values(), ignore_index=True)
+        return dataframe
     except requests.exceptions.RequestException as e:
         st.error(f"Error al descargar el archivo CSV: {e}")
         return None
